@@ -34,7 +34,6 @@ extension ServerError: LocalizedError {
         case .invalidRequest(_, let message): return message
         }
     }
-    
 }
 
 /// MARK: - Equatable
@@ -56,6 +55,4 @@ extension ServerError: Equatable {
             return false
         }
     }
-    
 }
-

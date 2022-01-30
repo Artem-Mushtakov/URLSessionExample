@@ -26,9 +26,7 @@ public final class RESTClient {
     // MARK: - Public methods
 
     public static func call(request: URLRequest, session: URLSession?, completion handler: @escaping ResultCompletionHandler) {
-        
-        
-        
+
         let completionHandler: SessionCompletionHandler = { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 handler(ResponseResult.failure(ServerError.networkProblem))
@@ -52,22 +50,18 @@ public final class RESTClient {
                 }
             }
         }
-        
-        
-        
-        
+
         self.resumeDataTask(with: request, session: session, completionHandler: completionHandler)
     }
     
     public static func resumeDataTask(with request: URLRequest,
-                               session: URLSession?,
-                               completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
+                                      session: URLSession?,
+                                      completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
     {
         (session ?? URLSession.shared)
             .dataTask(with: request, completionHandler: completionHandler).resume()
 
-//        URLSession.shared.uploadTask(with: request, from: Data()) // POST, PUT
-//        (session ?? URLSession.shared).downloadTask(with: request, completionHandler: completionHandler).resume()
+        //        URLSession.shared.uploadTask(with: request, from: Data()) // POST, PUT
+        //        (session ?? URLSession.shared).downloadTask(with: request, completionHandler: completionHandler).resume()
     }
 }
-
