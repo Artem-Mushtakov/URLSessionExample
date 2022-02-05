@@ -35,8 +35,6 @@ class ViewController: UIViewController {
         
         endpointClient.executeRequest(endpoint, completion: completion)
     }
-
-
 }
 
 final class GetNameEndpoint: ObjectResponseEndpoint<String> {
