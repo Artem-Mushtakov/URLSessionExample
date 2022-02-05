@@ -60,8 +60,5 @@ public final class RESTClient {
     {
         (session ?? URLSession.shared)
             .dataTask(with: request, completionHandler: completionHandler).resume()
-
-        //        URLSession.shared.uploadTask(with: request, from: Data()) // POST, PUT
-        //        (session ?? URLSession.shared).downloadTask(with: request, completionHandler: completionHandler).resume()
     }
 }

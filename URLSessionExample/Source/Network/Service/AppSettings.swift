@@ -55,6 +55,5 @@ public final class ApplicationSettingsService {
             }
         }
     }
-
     private let passwordLock = NSLock()
 }
