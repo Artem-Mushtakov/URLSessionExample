@@ -21,14 +21,22 @@ class ViewController: UIViewController {
     
     func executeCall() {
         let endpoint = GetNameEndpoint()
-        let completion: EndpointClient.ObjectEndpointCompletion<String> = { result, response in
+        let completion: EndpointClient.ObjectEndpointCompletion<Cards> = { result, response in
             guard let responseUnwrapped = response else { return }
             
             print("\n\n response = \(responseUnwrapped.allHeaderFields) ;\n \(responseUnwrapped.statusCode) \n")
             switch result {
-            case .success(let team):
-                print("team = \(team)")
-                
+            case .success(let data):
+
+                for i in data.cards {
+                    print("Names: \(i.name ?? "")")
+                    print("Cmc: \(i.cmc ?? 0 )")
+                    print("ManaCost: \(i.manaCost ?? "")")
+                    print("Toughness: \(i.toughness ?? "")")
+                    print("ID: \(i.id ?? "")")
+                    print("Flavor: \(i.flavor ?? "")\n")
+                }
+
             case .failure(let error):
                 print(error)
             }
@@ -38,38 +46,13 @@ class ViewController: UIViewController {
     }
 }
 
-final class GetNameEndpoint: ObjectResponseEndpoint<String> {
+final class GetNameEndpoint: ObjectResponseEndpoint<Cards> {
 
     override var method: RESTClient.RequestType { return .get }
-    override var path: String { "/v1/public/characters" }
-
-    let timeStamp = NSDate().timeIntervalSince1970.description
-    let publicKey = "4115a60241c2fc3734625110328b11f3"
-    let privateKey = "70fbecd8502cd87b598d9296085c8e2d36b74c10"
+    override var path: String { "/v1/cards" }
 
     override init() {
         super.init()
-        queryItems = [URLQueryItem(name: "name", value: "Deadpool"),
-                      URLQueryItem(name: "ts", value: "\(timeStamp)"),
-                      URLQueryItem(name: "apikey", value: "\(publicKey)"),
-                      URLQueryItem(name: "hash", value: (timeStamp + privateKey + publicKey).md5())]
-    }
-}
-
-func decodeJSONOld() {
-    let str = """
-        {\"team\": [\"ios\", \"android\", \"backend\"]}
-    """
-    
-    let data = Data(str.utf8)
-    
-    do {
-        if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-            if let names = json["team"] as? [String] {
-                print(names)
-            }
-        }
-    } catch let error as NSError {
-        print("Failed to load: \(error.localizedDescription)")
+        queryItems = [URLQueryItem(name: "name", value: "Optimus Prime|Black Lotus")]
     }
 }
