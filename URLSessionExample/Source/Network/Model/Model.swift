@@ -19,4 +19,3 @@ struct Card: Codable {
     let id: String?
     let flavor: String?
 }
-
