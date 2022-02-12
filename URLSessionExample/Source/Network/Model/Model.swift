@@ -6,3 +6,17 @@
 //
 
 import Foundation
+
+struct Cards: Codable {
+    let cards: [Card]
+}
+
+struct Card: Codable {
+    let name: String?
+    let manaCost: String?
+    let cmc: Int?
+    let toughness: String?
+    let id: String?
+    let flavor: String?
+}
+
