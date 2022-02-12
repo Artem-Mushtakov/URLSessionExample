@@ -55,13 +55,5 @@ public final class ApplicationSettingsService {
             }
         }
     }
-    
-    // MARK: - Private Properties
-
     private let passwordLock = NSLock()
-    
-    // MARK: - Initialization
-    
-    // MARK: - Public
-  
 }

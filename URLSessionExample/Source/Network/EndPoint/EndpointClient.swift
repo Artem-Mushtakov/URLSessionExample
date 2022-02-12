@@ -17,50 +17,48 @@ public enum PureResult<E> {
     case failure(E)
 }
 
-
 public final class EndpointClient {
-
+    
     // MARK: - Types
-
+    
     public typealias ObjectEndpointCompletion<Object: Decodable> = (Result<Object, Error>, HTTPURLResponse?) -> ()
     public typealias SuccessEndpointCompletion = (PureResult<Error>) -> ()
-
+    
     // MARK: - Private Properties
-
+    
     private let applicationSettings: ApplicationSettingsService
-    private var masterServerURL: String { "https://api.magicthegathering.io" }
-//    private var masterServerURL: String { "http://localhost:5055" }
-
+    private var masterServerURL: String { "https://gateway.marvel.com" }
+    
     // MARK: - Initialization
-
+    
     public init(applicationSettings: ApplicationSettingsService) {
         self.applicationSettings = applicationSettings
     }
-
+    
     // MARK: - Public Methods
-
+    
     public func executeRequest<Object: Decodable>(_ endpoint: ObjectResponseEndpoint<Object>,
-                                           completion: @escaping ObjectEndpointCompletion<Object>) {
+                                                  completion: @escaping ObjectEndpointCompletion<Object>) {
         guard let requestURL = makeRequestUrl(path: endpoint.path, queryItems: endpoint.queryItems) else {
             completion(.failure(EndpointClientError.wrongURL), nil)
             return
         }
         var body: String?
-
+        
         if let endpointParameters = endpoint.parameters {
             let jsonData = try? JSONSerialization.data(withJSONObject: endpointParameters)
             if let data = jsonData {
                 body = String(data: data, encoding: .utf8)
             }
         }
-
+        
         var urlSession: URLSession?
         if let requestTimeout = endpoint.timeout {
             urlSession = makeUrlSessionWithTimeout(requestTimeout)
         }
-
+        
         let completionHandler = objectResponseCompletionHandler(completion: completion)
-
+        
         executeRequest(method: endpoint.method,
                        requestUrl: requestURL,
                        headers: endpoint.httpHeaders,
@@ -68,26 +66,26 @@ public final class EndpointClient {
                        urlSession: urlSession,
                        completionHandler: completionHandler)
     }
-
+    
     public func executeRequest(_ endpoint: EmptyResponseEndpoint, completion: @escaping SuccessEndpointCompletion) {
         guard let requestURL = makeRequestUrl(path: endpoint.path, queryItems: endpoint.queryItems) else {
             completion(.failure(EndpointClientError.wrongURL))
             return
         }
         var body: String?
-
+        
         if let endpointParameters = endpoint.parameters {
             let jsonData = try? JSONSerialization.data(withJSONObject: endpointParameters)
             if let data = jsonData {
                 body =  String(data: data, encoding: .utf8)
             }
         }
-
+        
         var urlSession: URLSession?
         if let requestTimeout = endpoint.timeout {
             urlSession = makeUrlSessionWithTimeout(requestTimeout)
         }
-
+        
         let completionHandler = emptyResponseCompletionHandler(completion: completion)
         executeRequest(method: endpoint.method,
                        requestUrl: requestURL,
@@ -96,9 +94,9 @@ public final class EndpointClient {
                        urlSession: urlSession,
                        completionHandler: completionHandler)
     }
-
+    
     // MARK: - Private
-
+    
     private func makeRequestUrl(path: String, queryItems: [URLQueryItem]?) -> URL? {
         guard let baseURL = URL(string: masterServerURL) else {
             return nil
@@ -120,7 +118,7 @@ public final class EndpointClient {
         
         return requestURL
     }
-
+    
     private func makeUrlSessionWithTimeout(_ timeout: TimeInterval) -> URLSession {
         let configuration = URLSessionConfiguration.default
         configuration.allowsCellularAccess = true // Разрешать доступ с мобильной связи
@@ -130,10 +128,10 @@ public final class EndpointClient {
         configuration.urlCache = URLCache() // Кэш URL для предоставления кэшированных ответов на запросы в рамках сеанса.
         return URLSession(configuration: configuration)
     }
-
+    
     private func objectResponseCompletionHandler<Object: Decodable>(
         completion: @escaping ObjectEndpointCompletion<Object>
-        ) -> RESTClient.ResultCompletionHandler {
+    ) -> RESTClient.ResultCompletionHandler {
         return { result in
             switch result {
             case .success(let data, let response):
@@ -154,10 +152,10 @@ public final class EndpointClient {
             }
         }
     }
-
+    
     private func emptyResponseCompletionHandler(
         completion: @escaping SuccessEndpointCompletion
-        ) -> RESTClient.ResultCompletionHandler {
+    ) -> RESTClient.ResultCompletionHandler {
         return { result in
             switch result {
             case .success:
@@ -171,7 +169,7 @@ public final class EndpointClient {
             }
         }
     }
-
+    
     private func executeRequest(method: RESTClient.RequestType,
                                 requestUrl: URL,
                                 headers: [String: String]?,
@@ -181,20 +179,20 @@ public final class EndpointClient {
         let request = makeRequest(method: method, url: requestUrl, headers: headers, body: body)
         RESTClient.call(request: request, session: urlSession, completion: completionHandler)
     }
-
+    
     private func makeRequest(
         method: RESTClient.RequestType,
         url: URL,
         headers: [String: String]?,
         body: String?
-        ) -> URLRequest {
+    ) -> URLRequest {
         var request = URLRequest(url: url) // уже содержит query items
         request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
         request.httpBody = body?.data(using: String.Encoding.utf8)
         return request
     }
-
+    
     private func map<D: Decodable>(_ type: D.Type,
                                    data: Data?,
                                    using decoder: JSONDecoder = .webApiDecoder()) throws -> D

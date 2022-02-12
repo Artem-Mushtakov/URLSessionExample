@@ -18,7 +18,7 @@ public enum EndpointClientError: Error {
 // MARK: - LocalizedError
 
 extension EndpointClientError: LocalizedError {
-
+    
     public var errorDescription: String? {
         switch self {
         case .noParsingData, .parsingError, .cantBuildJWTBody: return ""
@@ -47,6 +47,4 @@ extension EndpointClientError: Equatable {
             return false
         }
     }
-
 }
-
